@@ -2,25 +2,38 @@
 using System.Reflection.Emit;
 
 using HarmonyLib;
-using UnityEngine;
-using TMPro;
 
 
 [HarmonyPatch(typeof(BulkSorter), "FixedUpdate")]
 class OverwriteBulkUpdateCount
 {
-	// private Harmony? _harmony; 
-
-	static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
-        foreach (var instruction in instructions)
+        var codes = new List<CodeInstruction>(instructions);
+
+        for (int i = 0; i < codes.Count; i++)
         {
-            // this is so shit but works anyways (and technically has a slight anti-breakage feature)
-            if (instruction.opcode == OpCodes.Ldc_I4_4)
+            if (codes[i].opcode == OpCodes.Brtrue || codes[i].opcode == OpCodes.Brtrue_S)
             {
-                instruction.opcode = OpCodes.Ldc_I4_8;
+                if (codes[i - 1].OperandIs(AccessTools.Method(typeof(List<OrePiece>), "Contains")))
+                {
+                    codes[i].opcode = (codes[i].opcode == OpCodes.Brtrue) ? OpCodes.Brfalse : OpCodes.Brfalse_S;
+                }
             }
-            yield return instruction;
+
+            if (codes[i].OperandIs(AccessTools.Method(typeof(BulkSorter), "DumpAllStuckOre")))
+            {
+                for (int j = i; j < codes.Count; j++)
+                {
+                    if (codes[j].opcode == OpCodes.Ret)
+                    {
+                        codes[j].opcode = OpCodes.Nop;
+                        break;
+                    }
+                }
+            }
         }
+
+        return codes;
     }
 }
