@@ -7,13 +7,13 @@ internal static class PluginInfo
 	public const string Author = "lokzz";
 	public const string Name = "BulkSorterOverflowLess";
 	public const string GUID = "com." + Author + "." + Name;
-	public const string Version = "0.1.0";
+	public const string Version = "0.2.0";
 }
 
 [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
 public class Plugin : BaseUnityPlugin
 {
-	private Harmony _harmony;
+	private Harmony? _harmony; 
 
 	void Awake()
 	{
@@ -24,6 +24,6 @@ public class Plugin : BaseUnityPlugin
 
 	private void OnDestroy()
 	{
-		_harmony.UnpatchSelf();
+		_harmony?.UnpatchSelf();
 	}
 }
