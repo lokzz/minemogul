@@ -1,7 +1,7 @@
 my mods for minemogul.\
 written in bepinex, install before using.
 
-mods here:
+mods:
 > ## BulkSorterOverflowLess
 > fixes the broken logic inside the bulk sorter overflow code.
 
